@@ -34,10 +34,20 @@ func (ps *PubSub) Publish(payload interface{}, topic string) {
 	}
 }
 
+func (ps *PubSub) AddSubscription(ch chan interface{}, topic string) {
+	var subchs []chan interface{}
+	subchs, _ = ps.topics[topic]
+	subchs = append(subchs, ch)
+	ps.topics[topic] = subchs
+}
+
 func main() {
 	fmt.Println("Starting PUBSUB server...")	
 	server := NewPubSub()
 	sub := server.Subscribe("news")
 	server.Publish("what is up?", "news")
+	fmt.Println(<-sub)
+	server.AddSubscription(sub, "tech")
+	server.Publish("tired of side projects? call me!", "tech")
 	fmt.Println(<-sub)
 }
